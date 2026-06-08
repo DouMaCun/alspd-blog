@@ -1,0 +1,18 @@
+{
+  "name": "alspd-blog-frontend",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 50002",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 50002"
+  },
+  "dependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
+    "lucide-vue-next": "^0.468.0",
+    "vite": "^5.4.19",
+    "vue": "^3.5.17"
+  },
+  "devDependencies": {}
+}

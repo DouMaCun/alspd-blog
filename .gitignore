@@ -1,0 +1,45 @@
+# Dependencies and local package caches
+node_modules/
+frontend/node_modules/
+.m2/
+.npm-cache/
+
+# Build outputs
+target/
+backend/target/
+dist/
+frontend/dist/
+*.class
+
+# Vite cache
+frontend/.vite/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+backend/src/main/resources/application-local.yml
+backend/src/main/resources/application-local.yaml
+backend/src/main/resources/application-local.properties
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE and editor files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
