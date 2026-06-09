@@ -18,5 +18,6 @@ mybatis-plus:
     banner: false
 
 blog:
+  admin-token: alspd
   cors:
     allowed-origin: http://localhost:50002

@@ -2,6 +2,8 @@
 
 个人技术博客网站，用来沉淀微服务设计、识别算法、嵌入式、AI 使用和开发感悟。
 
+当前版本：Version 2，包含公开阅读站点和文章管理后台。
+
 ## 技术栈
 
 - 后端：JDK 17、Spring Boot 3.4、MyBatis-Plus、MySQL
@@ -15,6 +17,19 @@
 数据库你已创建为 `alspd-ai`。建表和示例数据脚本在 [sql/schema.sql](sql/schema.sql)，需要你手动执行。
 
 如果 MySQL 账号不是 `root` 或有密码，请修改 [backend/src/main/resources/application.yml](backend/src/main/resources/application.yml) 里的 `spring.datasource` 配置。
+
+## 管理后台
+
+后台入口：`http://localhost:50002/admin`
+
+管理接口统一使用请求头 `X-Admin-Token`。默认令牌配置在 [backend/src/main/resources/application.yml](backend/src/main/resources/application.yml)：
+
+```yaml
+blog:
+  admin-token: please-change-me
+```
+
+本地运行前建议改成自己的值。前端后台首次进入会要求输入管理令牌，并保存在浏览器 `localStorage`。
 
 ## 本地启动
 
@@ -45,4 +60,18 @@ npm.cmd run dev
 - `GET /api/tags`
 - `GET /api/stats`
 
-当前版本只开放公开阅读接口，避免直接暴露未鉴权的写接口。后续可以加带登录或管理令牌的文章管理后台。
+## 管理接口
+
+- `GET /api/admin/posts?page=1&size=10&keyword=&status=&categorySlug=`
+- `GET /api/admin/posts/{id}`
+- `POST /api/admin/posts`
+- `PUT /api/admin/posts/{id}`
+- `DELETE /api/admin/posts/{id}`
+- `GET /api/admin/categories`
+- `POST /api/admin/categories`
+- `PUT /api/admin/categories/{id}`
+- `DELETE /api/admin/categories/{id}`
+- `GET /api/admin/tags`
+- `POST /api/admin/tags`
+- `PUT /api/admin/tags/{id}`
+- `DELETE /api/admin/tags/{id}`

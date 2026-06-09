@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   ArrowLeft,
   BookOpen,
@@ -20,6 +20,7 @@ import {
   getStats,
   getTags
 } from './api/blog'
+import AdminPanel from './components/AdminPanel.vue'
 import heroImage from './assets/knowledge-desk.png'
 
 const pageSize = 6
@@ -48,6 +49,7 @@ const activePost = ref(null)
 const loading = ref(false)
 const detailLoading = ref(false)
 const error = ref('')
+const isAdminView = ref(window.location.pathname === '/admin')
 
 const contentBlocks = computed(() => {
   if (!activePost.value?.content) {
@@ -145,6 +147,26 @@ function closePost() {
   activePost.value = null
 }
 
+function syncRoute() {
+  isAdminView.value = window.location.pathname === '/admin'
+  if (!isAdminView.value && !posts.value.length) {
+    loadInitialData()
+  }
+}
+
+function showAdmin() {
+  window.history.pushState({}, '', '/admin')
+  isAdminView.value = true
+}
+
+function showBlog() {
+  window.history.pushState({}, '', '/')
+  isAdminView.value = false
+  if (!posts.value.length) {
+    loadInitialData()
+  }
+}
+
 function goPage(offset) {
   const nextPage = pageInfo.value.current + offset
   if (nextPage < 1 || nextPage > pageInfo.value.pages) {
@@ -160,11 +182,21 @@ function formatDate(value) {
   return String(value).slice(0, 10).replaceAll('-', '.')
 }
 
-onMounted(loadInitialData)
+onMounted(() => {
+  window.addEventListener('popstate', syncRoute)
+  if (!isAdminView.value) {
+    loadInitialData()
+  }
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('popstate', syncRoute)
+})
 </script>
 
 <template>
-  <div class="app-shell">
+  <AdminPanel v-if="isAdminView" @back="showBlog" />
+  <div v-else class="app-shell">
     <header class="site-header">
       <a class="brand" href="#" @click.prevent="closePost">
         <span class="brand-mark">A</span>
@@ -174,6 +206,7 @@ onMounted(loadInitialData)
         <span>{{ stats.postCount }} 篇</span>
         <span>{{ stats.categoryCount }} 类</span>
         <span>{{ stats.totalViews }} 次阅读</span>
+        <button class="header-admin-link" type="button" @click="showAdmin">管理</button>
       </nav>
     </header>
 
