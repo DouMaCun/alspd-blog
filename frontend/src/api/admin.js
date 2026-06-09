@@ -13,14 +13,15 @@ function buildUrl(path, params = {}) {
 
 async function adminRequest(path, options = {}) {
   const token = options.token || getStoredAdminToken()
+  const isFormData = options.body instanceof FormData
   const response = await fetch(buildUrl(path, options.params), {
     method: options.method || 'GET',
     headers: {
-      'Content-Type': 'application/json',
       'X-Admin-Token': token,
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(options.headers || {})
     },
-    body: options.body === undefined ? undefined : JSON.stringify(options.body)
+    body: options.body === undefined ? undefined : isFormData ? options.body : JSON.stringify(options.body)
   })
 
   let payload = null
@@ -101,4 +102,13 @@ export function updateAdminTag(id, body) {
 
 export function deleteAdminTag(id) {
   return adminRequest(`/tags/${id}`, { method: 'DELETE' })
+}
+
+export function uploadAdminImage(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  return adminRequest('/uploads/images', {
+    method: 'POST',
+    body: formData
+  })
 }

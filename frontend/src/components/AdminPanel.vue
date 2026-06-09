@@ -1,9 +1,10 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import {
   ArrowLeft,
   Edit3,
   FilePlus2,
+  ImagePlus,
   LogOut,
   RefreshCw,
   Save,
@@ -27,7 +28,8 @@ import {
   setStoredAdminToken,
   updateAdminCategory,
   updateAdminPost,
-  updateAdminTag
+  updateAdminTag,
+  uploadAdminImage
 } from '../api/admin'
 
 const emit = defineEmits(['back'])
@@ -66,8 +68,11 @@ const categoryForm = ref({ id: null, name: '', slug: '', description: '', sortOr
 const tagForm = ref({ id: null, name: '', slug: '' })
 const loading = ref(false)
 const saving = ref(false)
+const uploadingCover = ref(false)
+const uploadingContentImage = ref(false)
 const message = ref('')
 const error = ref('')
+const contentTextareaRef = ref(null)
 
 const isEditingPost = computed(() => Boolean(postForm.value.id))
 const selectedTagIds = computed(() => new Set(postForm.value.tagIds.map((id) => Number(id))))
@@ -171,6 +176,71 @@ async function savePost() {
   } finally {
     saving.value = false
   }
+}
+
+async function handleCoverUpload(event) {
+  const file = event.target.files?.[0]
+  event.target.value = ''
+  if (!file) {
+    return
+  }
+  uploadingCover.value = true
+  error.value = ''
+  try {
+    const upload = await uploadImageFile(file)
+    postForm.value.coverImage = upload.url
+    message.value = '封面图已上传'
+  } catch (err) {
+    error.value = err.message || '封面图上传失败'
+  } finally {
+    uploadingCover.value = false
+  }
+}
+
+async function handleContentImageUpload(event) {
+  const file = event.target.files?.[0]
+  event.target.value = ''
+  if (!file) {
+    return
+  }
+  uploadingContentImage.value = true
+  error.value = ''
+  try {
+    const upload = await uploadImageFile(file)
+    await insertContentImage(upload.url, upload.filename)
+    message.value = '正文图片已插入'
+  } catch (err) {
+    error.value = err.message || '正文图片上传失败'
+  } finally {
+    uploadingContentImage.value = false
+  }
+}
+
+async function uploadImageFile(file) {
+  if (!file.type || !file.type.startsWith('image/')) {
+    throw new Error('只能上传图片文件')
+  }
+  return uploadAdminImage(file)
+}
+
+async function insertContentImage(url, filename) {
+  const textarea = contentTextareaRef.value
+  const text = postForm.value.content || ''
+  const altText = filename.replace(/\.[^.]+$/, '')
+  const insertText = `\n![${altText}](${url})\n`
+
+  if (!textarea || typeof textarea.selectionStart !== 'number') {
+    postForm.value.content = `${text}${insertText}`
+    return
+  }
+
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  postForm.value.content = `${text.slice(0, start)}${insertText}${text.slice(end)}`
+  await nextTick()
+  textarea.focus()
+  const cursor = start + insertText.length
+  textarea.setSelectionRange(cursor, cursor)
 }
 
 async function removePost(post) {
@@ -452,10 +522,17 @@ onMounted(() => {
               <span>摘要</span>
               <textarea v-model="postForm.summary" required rows="3" maxlength="500" />
             </label>
-            <label>
+            <div class="field-block">
               <span>正文</span>
-              <textarea v-model="postForm.content" required rows="12" />
-            </label>
+              <div class="editor-upload-row">
+                <label class="file-upload-button">
+                  <ImagePlus :size="16" aria-hidden="true" />
+                  {{ uploadingContentImage ? '上传中' : '插入图片' }}
+                  <input type="file" accept="image/*" :disabled="uploadingContentImage" @change="handleContentImageUpload" />
+                </label>
+              </div>
+              <textarea ref="contentTextareaRef" v-model="postForm.content" required rows="12" />
+            </div>
 
             <div class="form-row">
               <label>
@@ -481,11 +558,20 @@ onMounted(() => {
                 <span>发布时间</span>
                 <input v-model="postForm.publishedAt" type="datetime-local" />
               </label>
-              <label>
+              <div class="field-block">
                 <span>封面图</span>
-                <input v-model="postForm.coverImage" placeholder="https://..." />
-              </label>
+                <div class="cover-input-row">
+                  <input v-model="postForm.coverImage" placeholder="/uploads/images/..." />
+                  <label class="file-upload-button">
+                    <ImagePlus :size="16" aria-hidden="true" />
+                    {{ uploadingCover ? '上传中' : '上传' }}
+                    <input type="file" accept="image/*" :disabled="uploadingCover" @change="handleCoverUpload" />
+                  </label>
+                </div>
+              </div>
             </div>
+
+            <img v-if="postForm.coverImage" :src="postForm.coverImage" alt="" class="cover-preview" />
 
             <label class="check-line">
               <input v-model="postForm.featured" type="checkbox" />

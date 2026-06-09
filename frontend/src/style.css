@@ -470,6 +470,27 @@ button {
   margin: 0 0 18px;
 }
 
+.detail-cover,
+.post-content-image {
+  display: block;
+  width: 100%;
+  max-width: 780px;
+  border: 1px solid #dce4e1;
+  border-radius: 8px;
+  background: #ffffff;
+  object-fit: cover;
+}
+
+.detail-cover {
+  aspect-ratio: 16 / 9;
+  margin: 0 0 24px;
+}
+
+.post-content-image {
+  height: auto;
+  margin: 10px 0 22px;
+}
+
 .detail-loading {
   position: fixed;
   right: 24px;
@@ -543,7 +564,8 @@ button {
 
 .admin-token-form label,
 .post-form label,
-.form-row label {
+.form-row label,
+.field-block {
   display: grid;
   gap: 6px;
   color: #516062;
@@ -704,6 +726,51 @@ button {
 .check-line input {
   width: 17px;
   min-height: 17px;
+}
+
+.editor-upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.cover-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.file-upload-button {
+  display: inline-flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #d7e1dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #263234;
+  cursor: pointer;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.file-upload-button input {
+  display: none;
+}
+
+.cover-preview {
+  display: block;
+  width: min(360px, 100%);
+  aspect-ratio: 16 / 9;
+  border: 1px solid #dce4e1;
+  border-radius: 8px;
+  background: #ffffff;
+  object-fit: cover;
 }
 
 .admin-tags {

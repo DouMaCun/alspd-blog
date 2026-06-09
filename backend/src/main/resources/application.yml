@@ -10,6 +10,10 @@ spring:
   jackson:
     time-zone: Asia/Shanghai
     date-format: yyyy-MM-dd HH:mm:ss
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 mybatis-plus:
   configuration:
@@ -19,5 +23,8 @@ mybatis-plus:
 
 blog:
   admin-token: alspd
+  upload:
+    image-dir: uploads/images
+    public-prefix: /uploads/images/
   cors:
     allowed-origin: http://localhost:50002

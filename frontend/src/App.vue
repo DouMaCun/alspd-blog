@@ -51,7 +51,7 @@ const detailLoading = ref(false)
 const error = ref('')
 const isAdminView = ref(window.location.pathname === '/admin')
 
-const contentBlocks = computed(() => {
+const contentSegments = computed(() => {
   if (!activePost.value?.content) {
     return []
   }
@@ -59,6 +59,20 @@ const contentBlocks = computed(() => {
     .split(/\n+/)
     .map((item) => item.trim())
     .filter(Boolean)
+    .map((item) => {
+      const imageMatch = item.match(/^!\[([^\]]*)\]\(([^)]+)\)$/)
+      if (imageMatch) {
+        return {
+          type: 'image',
+          alt: imageMatch[1],
+          url: imageMatch[2]
+        }
+      }
+      return {
+        type: 'text',
+        text: item
+      }
+    })
 })
 
 const activeCategoryName = computed(() => {
@@ -304,8 +318,18 @@ onBeforeUnmount(() => {
             <span v-for="tag in activePost.tags" :key="tag.slug">#{{ tag.name }}</span>
           </div>
 
+          <img v-if="activePost.coverImage" :src="activePost.coverImage" alt="" class="detail-cover" />
+
           <div class="post-content">
-            <p v-for="(block, index) in contentBlocks" :key="index">{{ block }}</p>
+            <template v-for="(segment, index) in contentSegments" :key="index">
+              <img
+                v-if="segment.type === 'image'"
+                :src="segment.url"
+                :alt="segment.alt"
+                class="post-content-image"
+              />
+              <p v-else>{{ segment.text }}</p>
+            </template>
           </div>
         </article>
 

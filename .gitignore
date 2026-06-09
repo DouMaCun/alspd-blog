@@ -34,6 +34,10 @@ backend/src/main/resources/application-local.properties
 *.sqlite
 *.sqlite3
 
+# Local uploaded media
+uploads/
+backend/uploads/
+
 # IDE and editor files
 .idea/
 .vscode/

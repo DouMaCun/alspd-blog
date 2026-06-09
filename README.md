@@ -31,6 +31,14 @@ blog:
 
 本地运行前建议改成自己的值。前端后台首次进入会要求输入管理令牌，并保存在浏览器 `localStorage`。
 
+后台发布文章时支持上传本地图片：
+
+- 封面图：在文章表单的“封面图”字段点击“上传”
+- 正文图：在“正文”编辑区点击“插入图片”，会自动插入 `![图片名](/uploads/images/...)`
+- 后端默认保存目录：`backend/uploads/images`，该目录已被 `.gitignore` 忽略
+- 图片访问路径：`/uploads/images/...`
+- 单文件上传上限：`10MB`
+
 ## 本地启动
 
 后端：
@@ -75,3 +83,4 @@ npm.cmd run dev
 - `POST /api/admin/tags`
 - `PUT /api/admin/tags/{id}`
 - `DELETE /api/admin/tags/{id}`
+- `POST /api/admin/uploads/images`

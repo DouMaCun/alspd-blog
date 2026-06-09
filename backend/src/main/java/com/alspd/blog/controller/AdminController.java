@@ -9,7 +9,10 @@ import com.alspd.blog.domain.request.TagRequest;
 import com.alspd.blog.domain.vo.AdminPostVO;
 import com.alspd.blog.domain.vo.CategoryVO;
 import com.alspd.blog.domain.vo.TagVO;
+import com.alspd.blog.domain.vo.UploadVO;
 import com.alspd.blog.service.BlogService;
+import com.alspd.blog.service.UploadService;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,9 +31,11 @@ import java.util.List;
 public class AdminController {
 
     private final BlogService blogService;
+    private final UploadService uploadService;
 
-    public AdminController(BlogService blogService) {
+    public AdminController(BlogService blogService, UploadService uploadService) {
         this.blogService = blogService;
+        this.uploadService = uploadService;
     }
 
     @GetMapping("/posts")
@@ -109,5 +116,10 @@ public class AdminController {
     public ApiResponse<Void> deleteTag(@PathVariable Long id) {
         blogService.deleteTag(id);
         return ApiResponse.ok(null);
+    }
+
+    @PostMapping(value = "/uploads/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<UploadVO> uploadImage(@RequestParam("file") MultipartFile file) {
+        return ApiResponse.ok(uploadService.uploadImage(file));
     }
 }
